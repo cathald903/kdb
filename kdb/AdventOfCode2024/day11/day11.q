@@ -5,7 +5,8 @@ data: "J"$ " " vs raze read0 `:input.txt;
 blink:75;
 seenBefore:(enlist -1)!enlist (1 2);
 newOrder:();
-iterationsLeft:([]n:data;iterations:(count data)#blink);
+iterationsLeft:([]n:data;iterations:(count data)#blink;timesToDo:1);
+iterationsLeft:0!select sum timesToDo by n,iterations from iterationsLeft;
 applyRules:{[stone]
     r:$[ stone = 0;
             1;
@@ -17,8 +18,8 @@ applyRules:{[stone]
     };
 
 f:{[stone;b;times]
-    r:stone;
-    i:5;
+    stone;
+    i:20;
     remainder:$[    b>i;
                         b-i;
                     b<i;
@@ -40,25 +41,22 @@ f:{[stone;b;times]
     iterationsLeft::delete from iterationsLeft where i= 0;
     stone:raze over stone;
     if[remainder;
-        `iterationsLeft upsert raze {[x;stone;remainder] ([]n:stone;iterations:(count stone)#remainder)}[;stone;remainder]each til times;
+        temp:select sum timesToDo by n,iterations from ([]n:stone;iterations:remainder;timesToDo:times);
+        p:exec n from iterationsLeft where iterations = remainder;
+        iterationsLeft:: iterationsLeft pj select from temp where n in p;
+        iterationsLeft:: iterationsLeft upsert 0!select from temp where not n in p;
         :()
         ];
     newOrder::newOrder,times * count stone;
     };
-\ts f[;blink;1] each data;
-f1:{[stone;b]
-    t:(first exec times from exec times:count i by n,iterations from iterationsLeft where n = stone,iterations=b);
+f1:{[stone;b;t]
+    show " " sv (string .z.T;"starting";string stone;string b;string t);
     f[stone;b;t];
-    iterationsLeft::delete from iterationsLeft where n=stone,iterations=b;
-    //show count distinct iterationsLeft
+    show " " sv (string .z.T;"finished";string stone;string b;string t);
 
     };
 \ts while[count iterationsLeft;
-    {f1[x[`n];x[`iterations]]} first iterationsLeft
+    {f1[x[`n];x[`iterations];x[`timesToDo]]} first iterationsLeft;iterationsLeft
    ];
 
-// 3893 201409552 for 35    
-// 789  153256432
-// 4006 6849888 for 25
-// 1816 5268448 for 25
-// 1322 25990288
+// 3322 4472512 for 75
