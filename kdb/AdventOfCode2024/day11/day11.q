@@ -5,8 +5,13 @@ data: "J"$ " " vs raze read0 `:input.txt;
 blink:75;
 seenBefore:(enlist -1)!enlist (1 2);
 newOrder:();
+// a table to store what number have how many iterations left how many times
+// essentially used to avoid having to build giant lists that consume too much memory
+// as we don't care about order, only number of stones, so we can break up the order of  
+// calculations as we want
 iterationsLeft:([]n:data;iterations:(count data)#blink;timesToDo:1);
 iterationsLeft:0!select sum timesToDo by n,iterations from iterationsLeft;
+
 applyRules:{[stone]
     r:$[ stone = 0;
             1;
@@ -18,8 +23,7 @@ applyRules:{[stone]
     };
 
 f:{[stone;b;times]
-    stone;
-    i:20;
+    i:15; // limiting to 15 because it seems to be the sweet spot for chunk size
     remainder:$[    b>i;
                         b-i;
                     b<i;
@@ -27,7 +31,7 @@ f:{[stone;b;times]
                     0];
     while[i;
         if[1 < count stone;
-            stone:raze over stone;  
+            stone:raze over stone;  //flatten lists
             ];
         if[any t:not stone in key seenBefore;
             $[1 = count t;
@@ -38,8 +42,8 @@ f:{[stone;b;times]
         stone:seenBefore[stone];
         i-:1
     ];
-    iterationsLeft::delete from iterationsLeft where i= 0;
-    stone:raze over stone;
+    iterationsLeft::delete from iterationsLeft where i= 0; // completed the topmost item in the table, so we can remove it.
+    stone:raze over stone; //flatten lists
     if[remainder;
         temp:select sum timesToDo by n,iterations from ([]n:stone;iterations:remainder;timesToDo:times);
         p:exec n from iterationsLeft where iterations = remainder;
@@ -59,4 +63,6 @@ f1:{[stone;b;t]
     {f1[x[`n];x[`iterations];x[`timesToDo]]} first iterationsLeft;iterationsLeft
    ];
 
-// 3322 4472512 for 75
+// 3322 4472512 for 75 using i = 25
+// 2093 4555600 for 75 using i = 10
+// 1776 4472736 for 75 using i = 15
