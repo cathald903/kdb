@@ -1,0 +1,29 @@
+{
+  "name": "DataSource",
+  "dataSource": {
+    "selectedType": "API",
+    "api": {
+      "selectedApi": "",
+      "table": "",
+      "startTS": "",
+      "endTS": "",
+      "fill": "zero",
+      "temporality": "snapshot",
+      "rowCountLimit": "100000",
+      "isRowLimitLast": true,
+      "filter": [],
+      "groupBy": [],
+      "agg": [],
+      "sortCols": [],
+      "slice": [],
+      "labels": []
+    },
+    "qsql": {
+      "query": "",
+      "selectedTarget": ""
+    },
+    "sql": {
+      "query": ""
+    }
+  }
+}

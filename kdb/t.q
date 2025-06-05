@@ -1,0 +1,1 @@
+s:read0`:sensors.txt
