@@ -53,13 +53,3 @@ bad_reports: data where not good_reports;
 t:bad_reports where f2 each bad_reports;
 res2: sum f2 each bad_reports;
 res1 + res2
-
-brute_forcer:{[row]
-    found:0b;
-    counter:0;
-    while[(not found) and counter <count row;
-        found:f[@[row;(til count row) except counter]];
-        counter+:1;
-    ];
-    found 
- };
